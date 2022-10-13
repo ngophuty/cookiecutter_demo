@@ -1,0 +1,8 @@
+from motor.motor_asyncio import AsyncIOMotorClient
+from {{cookiecutter.file_env_name}} import env 
+
+
+MONGO_DETAIL = f'{env.DATABASE_NAME}://{env.DATABASE_HOST}:{env.DATABASE_PORT}'
+client = AsyncIOMotorClient(MONGO_DETAIL)
+create_database = client.example
+collection = create_database.get_collection('exaple_mongodb')

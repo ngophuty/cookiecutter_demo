@@ -1,0 +1,13 @@
+from dataclasses import Field
+from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional
+
+
+class Example(BaseModel):
+
+    code : str = Field(primary_field = True)
+    example : str
+    name : str
+    email : Optional[str]
+    create : datetime

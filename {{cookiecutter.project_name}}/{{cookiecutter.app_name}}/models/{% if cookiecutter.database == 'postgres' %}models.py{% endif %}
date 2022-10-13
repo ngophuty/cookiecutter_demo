@@ -1,0 +1,10 @@
+from sqlalchemy import Column, Integer, String
+from {{cookiecutter.project_name}}.{{cookiecutter.app_name}}.database.postgres import Base
+
+
+class Example(Base):
+
+    __tablename__ = "example"
+    id = Column(Integer, primary_key = True, index = True)
+    title = Column(String)
+    description = Column(String)

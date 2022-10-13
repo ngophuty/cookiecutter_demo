@@ -1,0 +1,8 @@
+{
+    "project_name":"project",
+    "app_name": "app",
+    "file_env_name":"env",
+    "database": ["mongodb","postgres","no"],
+    "celery": ["yes","no"],
+    "redis": ["yes","no"]
+}
