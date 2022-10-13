@@ -4,5 +4,6 @@
     "file_env_name":"env",
     "database": ["mongodb","postgres","no"],
     "celery": ["yes","no"],
-    "redis": ["yes","no"]
+    "redis": ["yes","no"],
+    "_copy_without_render": [".github/*"]
 }
