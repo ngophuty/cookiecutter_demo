@@ -1,0 +1,36 @@
+stages:
+  - build
+  - deploy
+
+
+build-dev:
+  stage: build
+  only:
+    - dev
+  image: docker:18.09.7-dind
+  services:
+    - name: docker:18.09.7-dind
+  before_script:
+#  - mkdir -p /etc/docker/certs.d/$CI_REGISTRY_NAME && cp $CI_REGISTRY_CERT /etc/docker/certs.d/$CI_REGISTRY_NAME/$CI_REGISTRY_NAME.crt
+  - mkdir /.docker && touch /.docker/config.json && cp $DOCKER_AUTH_CONFIG ~/.docker/config.json
+  - docker login $CI_REGISTRY_URL
+#  - echo "$CI_REGISTRY_PASSWORD" | docker login -u 'robot$em+em' $CI_REGISTRY_URL --password-stdin
+  script:
+    - mv $DEV_ENV .env
+    - cat .env
+    - docker build --tag $CI_REGISTRY_URL/$DEV_REGISTRY_NAME:$CI_COMMIT_SHA --tag $CI_REGISTRY_URL/$DEV_REGISTRY_NAME:latest -f Dockerfile .
+    - docker push $CI_REGISTRY_URL/$DEV_REGISTRY_NAME:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_URL/$DEV_REGISTRY_NAME:latest
+
+
+deploy-dev:
+  image: alpine:3.13
+  stage: deploy
+  script:
+    - chmod og= $DEV_ID_RSA
+    - apt update && apt install openssh-client
+
+    - ssh -i $DEV_ID_RSA -o StrictHostKeyChecking=no $DEV_USER@$DEV_SERVER_IP "cd /opt/cxbox && docker pull harbor.registry.scc.local/qa/cxbox:latest && docker tag harbor.registry.scc.local/qa/cxbox:latest cxbox:latest && docker-compose up -d"
+
+  only:
+    - dev
