@@ -1,0 +1,57 @@
+services:
+  {{cookiecutter.project_name}}:
+    build:
+      dockerfile: Dockerfile
+    image: {{cookiecutter.project_name}}:1.0
+    port: 
+      - ${HOST_APP}:8000
+    command: 
+    volumes: 
+      - ./:/{{cookiecutter.project_name}}
+    
+  mongodb:
+    image: mongodb:1.0
+    restart: always
+    volumes:
+     - ./data/mongo:/data/mongo
+    enviroment:
+     - MONGO_INITDB_ROOT_USERNAME:${MONGO_USERNAME}
+     - MONGO_INITDB_ROOT_PASSWORD:${MONGO_PASSWORD}
+    ports:
+     - 27017:27017
+  
+  redis:
+    image: redisdb:1.0
+    restart: always
+    volumes:
+     - ./data/redis:/data/redis
+    
+  clelery_worker:
+    restart: unless-stopped
+    build: 
+     dockerfile: Dockerfile
+    volumes_from: 
+     -{{cookiecutter.project_name}}
+    volumes: ./logs:/logs
+    command: celery -A {{cookiecutter.app_name}}.celery.celery.app worker --loglevel=infor
+    depends_on: redis
+
+  celery_beat:
+    restart: unless-stopped
+    build:
+      dockerfile:Dockerfile
+    volumes_from: 
+     -{{cookiecutter.project_name}}
+    volumes: ./logs:/logs
+    command: celery -A {{cookiecutter.app_name}}.celery.celery.app beat --loglevel=infor
+    depends_on: redis
+
+network: 
+  defaut: 
+    name:
+    driver:
+    ipam:
+      driver:
+      config:
+      - subnet:
+        gateway:
